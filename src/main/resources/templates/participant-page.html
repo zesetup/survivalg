@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статус участника</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px;
+        }
+        .container {
+            max-width: 800px; margin: 0 auto; background: white;
+            padding: 40px; border-radius: 10px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        h1 { color: #333; margin-bottom: 10px; }
+        .game-info { color: #666; font-size: 14px; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #eee; }
+        .status-card {
+            background: #f0f4ff; padding: 30px; border-radius: 10px;
+            border-left: 4px solid #667eea; margin-bottom: 30px;
+        }
+        .status-label { color: #667eea; font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 10px; }
+        .status-value { font-size: 2em; font-weight: bold; margin-bottom: 15px; }
+        .status-IN_SHELTER { color: #27ae60; }
+        .status-OUTSIDE_SHELTER { color: #ef6c00; }
+        .status-ELIMINATED { color: #c62828; }
+        .timer {
+            font-size: 3em; font-weight: bold; color: #ef6c00;
+            font-family: 'Courier New', monospace; text-align: center;
+            padding: 20px; background: white; border-radius: 10px;
+            margin-top: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .timer-label { font-size: 14px; color: #999; margin-top: 10px; text-align: center; }
+        .info-box {
+            background: #fff; padding: 20px; border-radius: 10px;
+            border: 2px solid #eee; margin-bottom: 20px;
+        }
+        .info-box h3 { color: #667eea; margin-bottom: 15px; }
+        .info-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .info-item:last-child { border-bottom: none; }
+        .info-label { color: #666; font-weight: 600; }
+        .info-value { color: #333; }
+        .home-link { text-align: center; margin-top: 30px; }
+        .home-link a { color: #667eea; text-decoration: none; }
+        .home-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👤 <span th:text="${participant.nickname}">Участник</span></h1>
+        <div class="game-info">
+            Игра: <strong th:text="${game.name}">Название игры</strong><br>
+            Начало: <strong th:text="${#temporals.format(game.startDateTime, 'dd.MM.yyyy HH:mm')}">01.01.2026 12:00</strong>
+        </div>
+        <div class="status-card" hx-get th:attr="hx-get=@{/participant/{hash}/status(hash=${participant.uniqueHash})}" hx-trigger="every 5s" hx-swap="innerHTML">
+            <div class="status-label">Текущий статус</div>
+            <div th:class="'status-value status-' + ${participant.status}">
+                <span th:if="${participant.status.name() == 'IN_SHELTER'}">🏠 В убежище</span>
+                <span th:if="${participant.status.name() == 'OUTSIDE_SHELTER'}">🌍 Вне убежища</span>
+                <span th:if="${participant.status.name() == 'ELIMINATED'}">💀 Погиб</span>
+            </div>
+            <div th:if="${participant.status.name() == 'IN_SHELTER'}" style="color: #27ae60;">
+                Вы находитесь в безопасности. Ожидайте дальнейших указаний от администратора.
+            </div>
+            <div th:if="${participant.status.name() == 'OUTSIDE_SHELTER'}">
+                <p style="color: #ef6c00; font-weight: 600;">⚠️ Вы находитесь вне убежища!</p>
+                <p>У вас осталось времени до гибели:</p>
+                <div class="timer" hx-get th:attr="hx-get=@{/participant/{hash}/timer(hash=${participant.uniqueHash})}" hx-trigger="every 1s" hx-swap="innerHTML" th:attr="data-remaining=${remainingSeconds}">
+                    <span th:text="${#numbers.formatInteger(remainingSeconds / 3600, 2) + ':' + #numbers.formatInteger((remainingSeconds % 3600) / 60, 2) + ':' + #numbers.formatInteger(remainingSeconds % 60, 2)}">00:00:00</span>
+                </div>
+                <div class="timer-label">Формат: часы:минуты:секунды</div>
+            </div>
+            <div th:if="${participant.status.name() == 'ELIMINATED'}" style="color: #c62828; text-align: center;">
+                <p style="font-size: 1.2em; margin-top: 20px;">Вы не успели вернуться в убежище вовремя и погибли.</p>
+                <p style="margin-top: 10px;">Игра для вас завершена.</p>
+            </div>
+        </div>
+        <div class="info-box">
+            <h3>📊 Информация об участнике</h3>
+            <div class="info-item">
+                <span class="info-label">Никнейм:</span>
+                <span class="info-value" th:text="${participant.nickname}">Участник</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Дата регистрации:</span>
+                <span class="info-value" th:text="${#temporals.format(participant.registeredAt, 'dd.MM.yyyy HH:mm')}">01.01.2026 12:00</span>
+            </div>
+            <div class="info-item" th:if="${participant.leftShelterAt != null}">
+                <span class="info-label">Покинул убежище:</span>
+                <span class="info-value" th:text="${#temporals.format(participant.leftShelterAt, 'dd.MM.yyyy HH:mm')}">01.01.2026 13:00</span>
+            </div>
+        </div>
+        <div class="home-link">
+            <a href="/">← Вернуться на главную страницу</a>
+        </div>
+    </div>
+</body>
+</html>

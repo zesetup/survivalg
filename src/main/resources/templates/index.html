@@ -47,7 +47,84 @@
             color: #555;
             font-size: 1em;
             line-height: 1.6;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
+        }
+
+        .game-info {
+            background: #f0f4ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .game-info h2 {
+            color: #667eea;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .game-info h3 {
+            color: #333;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .game-info p {
+            color: #666;
+        }
+
+        .registration-form {
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .no-game {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            margin: 30px 0;
+        }
+
+        .admin-link {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .admin-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .admin-link a:hover {
+            text-decoration: underline;
         }
 
         .button-group {
@@ -151,53 +228,38 @@
 <body>
     <div class="container">
         <h1>🎮 Survival Game</h1>
-        <p class="subtitle">Добро пожаловать на острво выживания</p>
+        <p class="subtitle">Добро пожаловать на остров выживания</p>
 
-        <p class="description">
-            Испытайте свои навыки выживания в условиях враждебной среды.
-            Собирайте ресурсы, стройте укрытие и попытайтесь остаться в живых
-            столько дней, сколько сможете!
-        </p>
-
-        <div class="button-group">
-            <button class="btn-primary" onclick="startGame()">Начать игру</button>
-            <button class="btn-secondary" onclick="viewRules()">Правила игры</button>
-        </div>
-
-        <div class="features">
-            <h3>Особенности игры</h3>
-            <div class="features-list">
-                <div class="feature-item">
-                    <strong>⚙️ Динамичный геймплей</strong>
-                    <p>Система день-ночь и изменяющиеся условия окружающей среды</p>
-                </div>
-                <div class="feature-item">
-                    <strong>🏗️ Строительство</strong>
-                    <p>Создавайте сооружения для защиты от опасностей</p>
-                </div>
-                <div class="feature-item">
-                    <strong>📊 Прогрессия</strong>
-                    <p>Улучшайте свои умения и разблокируйте новые возможности</p>
-                </div>
-                <div class="feature-item">
-                    <strong>🏆 Рейтинг</strong>
-                    <p>Соревнуйтесь с другими игроками в таблице лидеров</p>
-                </div>
+        <div th:if="${game != null}">
+            <div class="game-info">
+                <h2>Открыта регистрация на игру:</h2>
+                <h3 th:text="${game.name}"></h3>
+                <p>Дата и время начала: <strong th:text="${#temporals.format(game.startDateTime, 'dd MMMM yyyy, HH:mm', new java.util.Locale('ru'))}"></strong></p>
             </div>
+
+            <form method="post" action="/participant/register" class="registration-form">
+                <input type="hidden" name="gameId" th:value="${game.id}">
+                <div class="form-group">
+                    <label for="nickname">Введите ваш никнейм:</label>
+                    <input type="text" id="nickname" name="nickname" required minlength="2" maxlength="50" placeholder="Ваш никнейм">
+                </div>
+                <button type="submit" class="btn-primary">Зарегистрироваться</button>
+            </form>
         </div>
+
+        <div th:unless="${game != null}">
+            <p class="description">
+                Испытайте свои навыки выживания в условиях враждебной среды.
+                Попытайтесь остаться в живых столько времени, сколько сможете!
+            </p>
+            <p class="no-game">В данный момент нет открытых игр для регистрации.</p>
+        </div>
+
+        <div class="admin-link">
+            <a href="/admin/login">Вход для администратора</a>
+        </div>
+
     </div>
-
-    <script>
-        function startGame() {
-            alert('Игра скоро будет доступна!');
-            // window.location.href = '/game';
-        }
-
-        function viewRules() {
-            alert('Правила игры:');
-            // window.location.href = '/rules';
-        }
-    </script>
 </body>
 </html>
 

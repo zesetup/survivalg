@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Участники игры</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .game-info {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .back-link {
+            margin-top: 10px;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        .participants-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        tr:hover {
+            background: #f0f0f0;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-IN_SHELTER {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-OUTSIDE_SHELTER {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .status-ELIMINATED {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .no-participants {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .participant-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 12px;
+            word-break: break-all;
+        }
+
+        .participant-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>👥 Участники игры: <span th:text="${game.name}"></span></h1>
+        <div class="game-info">
+            <p>Дата начала: <span th:text="${#temporals.format(game.startDateTime, 'dd.MM.yyyy HH:mm')}"></span></p>
+            <p>Статус игры: <span th:text="${game.status.name()}"></span></p>
+        </div>
+        <div class="back-link">
+            <a href="/admin/games">← Вернуться к списку игр</a>
+        </div>
+    </div>
+
+    <div class="participants-table">
+        <table th:if="${participants != null && !participants.isEmpty()}">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Никнейм</th>
+                    <th>Статус</th>
+                    <th>Вышел из убежища</th>
+                    <th>Зарегистрирован</th>
+                    <th>Ссылка участника</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="participant : ${participants}">
+                    <td th:text="${participant.id}"></td>
+                    <td th:text="${participant.nickname}"></td>
+                    <td>
+                        <span th:class="'status-badge status-' + ${participant.status}"
+                              th:text="${participant.status.name()}"></span>
+                    </td>
+                    <td th:text="${participant.leftShelterAt != null ? #temporals.format(participant.leftShelterAt, 'dd.MM.yyyy HH:mm') : '-'}"></td>
+                    <td th:text="${#temporals.format(participant.registeredAt, 'dd.MM.yyyy HH:mm')}"></td>
+                    <td>
+                        <a th:href="@{/participant/{hash}(hash=${participant.uniqueHash})}"
+                           class="participant-link" target="_blank"
+                           th:text="'/participant/' + ${participant.uniqueHash}"></a>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <form th:action="@{/admin/participants/{id}/remove-from-shelter(id=${participant.id})}"
+                                  method="post" style="display: inline;">
+                                <input type="hidden" name="gameId" th:value="${game.id}">
+                                <button type="submit" class="btn btn-danger"
+                                        th:disabled="${participant.status.name() != 'IN_SHELTER'}">
+                                    Удалить из убежища
+                                </button>
+                            </form>
+                            <form th:action="@{/admin/participants/{id}/return-to-shelter(id=${participant.id})}"
+                                  method="post" style="display: inline;">
+                                <input type="hidden" name="gameId" th:value="${game.id}">
+                                <button type="submit" class="btn btn-success"
+                                        th:disabled="${participant.status.name() != 'OUTSIDE_SHELTER'}">
+                                    Вернуть в убежище
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div th:if="${participants == null || participants.isEmpty()}" class="no-participants">
+            <p>Нет зарегистрированных участников</p>
+        </div>
+    </div>
+</body>
+</html>
+
