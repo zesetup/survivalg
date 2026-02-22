@@ -15,7 +15,7 @@
         <div th:if="${participant.status.name() == 'OUTSIDE_SHELTER'}">
             <p style="color: #ef6c00; font-weight: 600;">⚠️ Вы находитесь вне убежища!</p>
             <p>У вас осталось времени до гибели:</p>
-            <div class="timer" hx-get th:attr="hx-get=@{/participant/{hash}/timer(hash=${participant.uniqueHash})}" hx-trigger="every 1s" hx-swap="innerHTML">
+            <div class="timer" th:attr="hx-get=@{/participant/{hash}/timer(hash=${participant.uniqueHash})}" hx-trigger="every 1s" hx-swap="innerHTML">
                 <span th:text="${#numbers.formatInteger(remainingSeconds / 3600, 2) + ':' + #numbers.formatInteger((remainingSeconds % 3600) / 60, 2) + ':' + #numbers.formatInteger(remainingSeconds % 60, 2)}">00:00:00</span>
             </div>
             <div class="timer-label">Формат: часы:минуты:секунды</div>
