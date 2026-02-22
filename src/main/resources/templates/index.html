@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Survival Game - Главная</title>
+    <title>Stalk Zona - Главная</title>
     <style>
         * {
             margin: 0;
@@ -227,12 +227,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>☢️ Survival Game</h1>
+        <h1>☢️ Stalk Zona</h1>
         <p class="subtitle">Добро пожаловать в зону выживания</p>
 
         <div th:if="${game != null}">
             <div class="game-info">
-                <h2>Открыта регистрация на игру:</h2>
+                <h2>Открыта регистрация на операцию:</h2>
                 <h3 th:text="${game.name}"></h3>
                 <p>Дата и время начала: <strong th:text="${#temporals.format(game.startDateTime, 'dd MMMM yyyy, HH:mm', new java.util.Locale('ru'))}"></strong></p>
             </div>

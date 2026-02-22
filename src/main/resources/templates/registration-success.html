@@ -49,10 +49,10 @@
         <div class="success-icon">✅</div>
         <h1>Регистрация успешна!</h1>
         <p>Добро пожаловать, <strong th:text="${participant.nickname}">Участник</strong>!</p>
-        <p>Вы успешно зарегистрированы на игру <strong th:text="${participant.game.name}">Игра</strong></p>
+        <p>Вы успешно зарегистрированы на операцию <strong th:text="${participant.game.name}">Игра</strong></p>
         <div class="participant-link">
             <h3>Ваша персональная ссылка:</h3>
-            <p>Сохраните эту ссылку! По ней вы сможете следить за своим статусом в игре.</p>
+            <p>Сохраните эту ссылку! По ней вы сможете следить за своим статусом в операции.</p>
             <div class="link-box">
                 <a th:href="@{/participant/{hash}(hash=${participant.uniqueHash})}" 
                    th:text="${baseUrl} + '/participant/' + ${participant.uniqueHash}">
