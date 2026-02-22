@@ -2,11 +2,10 @@ package com.gmail.zerosetup.survivalg.controller;
 
 import com.gmail.zerosetup.survivalg.model.Participant;
 import com.gmail.zerosetup.survivalg.service.GameService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/participant")
@@ -14,6 +13,9 @@ public class ParticipantController {
     
     private final GameService gameService;
     
+    @Value("${game.domain.name}")
+    private String domainName;
+
     public ParticipantController(GameService gameService) {
         this.gameService = gameService;
     }
@@ -21,19 +23,12 @@ public class ParticipantController {
     @PostMapping("/register")
     public String register(@RequestParam Long gameId, 
                           @RequestParam String nickname,
-                          HttpServletRequest request,
                           Model model) {
         try {
             Participant participant = gameService.registerParticipant(gameId, nickname);
 
-            // Build base URL for display purposes
-            String scheme = request.getScheme();
-            String serverName = request.getServerName();
-            int serverPort = request.getServerPort();
-            String baseUrl = scheme + "://" + serverName;
-            if ((scheme.equals("http") && serverPort != 80) || (scheme.equals("https") && serverPort != 443)) {
-                baseUrl += ":" + serverPort;
-            }
+            // Build base URL using configured domain name
+            String baseUrl = "https://" + domainName;
 
             model.addAttribute("participant", participant);
             model.addAttribute("baseUrl", baseUrl);
