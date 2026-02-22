@@ -55,7 +55,7 @@
             <p>Сохраните эту ссылку! По ней вы сможете следить за своим статусом в игре.</p>
             <div class="link-box">
                 <a th:href="@{/participant/{hash}(hash=${participant.uniqueHash})}" 
-                   th:text="${baseUrl + '/participant/' + participant.uniqueHash}">
+                   th:text="${baseUrl} + '/participant/' + ${participant.uniqueHash}">
                 </a>
             </div>
         </div>

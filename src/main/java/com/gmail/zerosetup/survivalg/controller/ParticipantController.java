@@ -26,7 +26,7 @@ public class ParticipantController {
         try {
             Participant participant = gameService.registerParticipant(gameId, nickname);
 
-            // Build base URL
+            // Build base URL for display purposes
             String scheme = request.getScheme();
             String serverName = request.getServerName();
             int serverPort = request.getServerPort();

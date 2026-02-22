@@ -10,7 +10,7 @@
             <span th:if="${participant.status.name() == 'ELIMINATED'}">💀 Погиб</span>
         </div>
         <div th:if="${participant.status.name() == 'IN_SHELTER'}" style="color: #27ae60;">
-            Вы находитесь в безопасности. Ожидайте дальнейших указаний от администратора.
+            Вы находитесь в безопасности. Ожидайте дальнейших указаний от командования.
         </div>
         <div th:if="${participant.status.name() == 'OUTSIDE_SHELTER'}">
             <p style="color: #ef6c00; font-weight: 600;">⚠️ Вы находитесь вне убежища!</p>
