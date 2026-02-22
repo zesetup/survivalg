@@ -144,5 +144,13 @@ public class GameService {
         
         return Math.max(0, remaining);
     }
+
+    public boolean hasActiveGames() {
+        List<Game> games = gameRepository.findAll();
+        return games.stream()
+                .anyMatch(game -> game.getStatus() == GameStatus.NEW ||
+                                 game.getStatus() == GameStatus.OPEN_FOR_REGISTRATION ||
+                                 game.getStatus() == GameStatus.ACTIVE);
+    }
 }
 

@@ -64,6 +64,7 @@ public class AdminController {
 
         List<Game> games = gameService.getAllGames();
         model.addAttribute("games", games);
+        model.addAttribute("hasActiveGames", gameService.hasActiveGames());
         return "admin/games";
     }
 

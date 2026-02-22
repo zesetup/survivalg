@@ -38,7 +38,7 @@
     <div class="header">
         <h1>☢️ Управление играми</h1>
         <div class="header-actions">
-            <a href="/admin/games/new" class="btn btn-primary">+ Создать игру</a>
+            <a th:if="${!hasActiveGames}" href="/admin/games/new" class="btn btn-primary">+ Создать игру</a>
             <a href="/admin/logout" class="btn btn-secondary">Выход</a>
         </div>
     </div>
@@ -54,7 +54,7 @@
                     <td th:text="${#temporals.format(game.startDateTime, 'dd.MM.yyyy HH:mm')}"></td>
                     <td>
                         <span th:class="'status-badge status-' + ${game.status}" th:text="${game.status.name()}"></span>
-                        <div class="status-controls">
+                        <div th:if="${game.status.name() != 'COMPLETED'}" class="status-controls">
                             <form th:action="@{/admin/games/{id}/status(id=${game.id})}" method="post" style="display: inline;">
                                 <input type="hidden" name="status" value="NEW">
                                 <button type="submit" class="btn btn-small btn-secondary" th:disabled="${game.status.name() == 'NEW'}">Новая</button>
@@ -75,7 +75,7 @@
                     </td>
                     <td th:text="${game.participants.size()}"></td>
                     <td>
-                        <div class="actions">
+                        <div th:if="${game.status.name() != 'COMPLETED'}" class="actions">
                             <a th:href="@{/admin/games/{id}/participants(id=${game.id})}" class="btn btn-small btn-info">Участники</a>
                             <a th:href="@{/admin/games/{id}/edit(id=${game.id})}" class="btn btn-small btn-secondary">Редактировать</a>
                         </div>
@@ -85,7 +85,7 @@
         </table>
         <div th:if="${games == null || games.isEmpty()}" class="no-games">
             <p>Нет созданных игр</p>
-            <a href="/admin/games/new" class="btn btn-primary" style="margin-top: 20px;">Создать первую игру</a>
+            <a th:if="${!hasActiveGames}" href="/admin/games/new" class="btn btn-primary" style="margin-top: 20px;">Создать первую игру</a>
         </div>
     </div>
 </body>
