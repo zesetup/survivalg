@@ -162,7 +162,7 @@
         <h1>👥 Участники игры: <span th:text="${game.name}"></span></h1>
         <div class="game-info">
             <p>Дата начала: <span th:text="${#temporals.format(game.startDateTime, 'dd.MM.yyyy HH:mm')}"></span></p>
-            <p>Статус игры: <span th:text="${game.status.name()}"></span></p>
+            <p>Статус игры: <span th:text="${game.status.displayName}"></span></p>
         </div>
         <div class="back-link">
             <a href="/admin/games">← Вернуться к списку игр</a>
@@ -188,7 +188,7 @@
                     <td th:text="${participant.nickname}"></td>
                     <td>
                         <span th:class="'status-badge status-' + ${participant.status}"
-                              th:text="${participant.status.name()}"></span>
+                              th:text="${participant.status.displayName}"></span>
                     </td>
                     <td th:text="${participant.leftShelterAt != null ? #temporals.format(participant.leftShelterAt, 'dd.MM.yyyy HH:mm') : '-'}"></td>
                     <td th:text="${#temporals.format(participant.registeredAt, 'dd.MM.yyyy HH:mm')}"></td>

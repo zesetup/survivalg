@@ -18,7 +18,52 @@
         button[type="submit"]:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102,126,234,0.4); }
         .btn-secondary { background: #f0f0f0; color: #333; flex: 1; text-align: center; }
         .btn-secondary:hover { background: #e0e0e0; }
+        input[type="date"], input[type="time"] { cursor: pointer; }
+        input[type="text"].date-input { cursor: text; }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const dateInput = document.getElementById('startDate');
+            const timeInput = document.getElementById('startTime');
+
+            // Auto-format date input (DD.MM.YYYY)
+            dateInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.substring(0, 2) + '.' + value.substring(2);
+                }
+                if (value.length >= 5) {
+                    value = value.substring(0, 5) + '.' + value.substring(5, 9);
+                }
+                e.target.value = value;
+            });
+
+            // Auto-format time input (HH:MM)
+            timeInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.substring(0, 2) + ':' + value.substring(2, 4);
+                }
+                e.target.value = value;
+            });
+
+            form.addEventListener('submit', function(e) {
+                const dateInputValue = dateInput.value;
+                const timeInputValue = timeInput.value;
+                const dateTimeInput = document.getElementById('startDateTime');
+
+                if (dateInputValue && timeInputValue) {
+                    // Parse DD.MM.YYYY to YYYY-MM-DD
+                    const dateParts = dateInputValue.split('.');
+                    if (dateParts.length === 3) {
+                        const isoDate = dateParts[2] + '-' + dateParts[1] + '-' + dateParts[0];
+                        dateTimeInput.value = isoDate + 'T' + timeInputValue;
+                    }
+                }
+            });
+        });
+    </script>
 </head>
 <body>
     <div class="container">
@@ -29,9 +74,22 @@
                 <input type="text" id="name" name="name" required>
             </div>
             <div class="form-group">
-                <label for="startDateTime">Дата и время начала:</label>
-                <input type="datetime-local" id="startDateTime" name="startDateTime" required>
+                <label for="startDate">Дата начала (ДД.ММ.ГГГГ):</label>
+                <input type="text" id="startDate" name="startDate" required
+                       class="date-input"
+                       pattern="\d{2}\.\d{2}\.\d{4}"
+                       placeholder="дд.мм.гггг"
+                       maxlength="10">
             </div>
+            <div class="form-group">
+                <label for="startTime">Время начала (ЧЧ:ММ):</label>
+                <input type="text" id="startTime" name="startTime" required
+                       class="date-input"
+                       pattern="[0-9]{2}:[0-9]{2}"
+                       placeholder="чч:мм"
+                       maxlength="5">
+            </div>
+            <input type="hidden" id="startDateTime" name="startDateTime">
             <div class="button-group">
                 <button type="submit">Создать игру</button>
                 <a href="/admin/games" class="btn btn-secondary">Отмена</a>
